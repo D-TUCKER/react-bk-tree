@@ -1,8 +1,14 @@
 // Addapted from https://github.com/tjbaron/node-bktree/blob/master/lib/bktree.js
-
+// @ts-check
 import damlev from "damlev";
 
 class bkTree {
+  /**
+   * Creates an instance of bkTree.
+   * @param {string[]|string} term 
+   * @param {object} options 
+   * @memberof bkTree
+   */
   constructor(term, options) {
     this.addTerms = this.addTerms.bind(this);
     this._addTerm = this._addTerm.bind(this);
@@ -13,29 +19,51 @@ class bkTree {
     this.stringCompare = damlev;
     this.options = options;
 
+    // We pass the Array of words initially.
     if (Array.isArray(term)) {
-      console.log(term);
+      // Last word in our list is the root.
       let tree = new bkTree(term.pop(), this.options);
+      // run add terms on the rest.
       tree.addTerms(term);
       return tree;
     }
     this.term = term;
     this.children = {};
   }
-
+  /**
+ * 
+ * 
+ * @param {string[]} newTerms 
+ * @memberof bkTree
+ */
   addTerms(newTerms) {
     newTerms.forEach(term => this._addTerm(term));
   }
-
+  /**
+ * 
+ * 
+ * @param {string} newTerm 
+ * @memberof bkTree
+ */
   _addTerm(newTerm) {
+    // Get the distance between the words
     const dist = this.stringCompare(this.term, newTerm);
+    // Check if distance exists already. Otherwise make a new tree.
     if (this.children[dist]) {
       this.children[dist]._addTerm(newTerm);
     } else {
       this.children[dist] = new bkTree(newTerm, this.options);
     }
   }
-
+  /**
+ * 
+ * 
+ * @param {string} queryTerm 
+ * @param {number} maxDist 
+ * @param {number} [max=null] 
+ * @returns {object[]|string[]}
+ * @memberof bkTree
+ */
   query(queryTerm, maxDist, max = null) {
     let tempResults = [];
 
@@ -53,7 +81,15 @@ class bkTree {
     }
     return results;
   }
-
+  /**
+ * 
+ * 
+ * @param {string} queryTerm 
+ * @param {number} maxDist 
+ * @param {number} d 
+ * @param {object[]} results 
+ * @memberof bkTree
+ */
   _query(queryTerm, maxDist, d, results) {
     const dist = this.stringCompare(this.term, queryTerm);
 

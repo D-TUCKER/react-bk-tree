@@ -12,7 +12,13 @@ const selected = selected => {
   console.log(`selected: ${selected}!`);
 };
 
-// OK, now I am just getting silly.
+/**
+ * 
+ * 
+ * @param {number} start 
+ * @param {number} end 
+ * @param {number} [step=1] 
+ */
 const range = function*(start, end, step = 1) {
   while (start <= end) {
     yield start;
@@ -25,18 +31,9 @@ const resultLimit = [...range(5, 100, 5)];
 
 class App extends Component {
   state = {
-    matches: [],
     distance: 2,
     resultLimit: 20
   };
-
-  // componentDidMount() {
-  //   this.tree = new bkTree(wordList);
-  // }
-
-  // componentDidUpdate() {
-
-  // }
 
   setDistance = event => {
     event.preventDefault();
@@ -52,15 +49,7 @@ class App extends Component {
     });
   };
 
-  // findMatches = (event) => {
-  //   //console.log(event.target.value);
-  //   this.setState({
-  //     matches: this.tree.query(event.target.value,1)
-  //   });
-  // }
-
   render() {
-    console.log(this.state.distance);
     return (
       <div className="App">
         <header className="App-header">

@@ -1,3 +1,5 @@
+// Spilts out sorts and json stringifies my the raw name list and saved it to names.json
+
 const { readFileSync, writeFileSync } = require("fs");
 
 const raw = readFileSync("./rawNames.txt", "utf8");
