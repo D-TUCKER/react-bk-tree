@@ -1,42 +1,56 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import BKDownshift from "./downshift/bkDownshift";
 
-import wordList from "./bkTree/wordList";
-import bkTree from './bkTree/bkTree';
+import wordList from "./bkTree/names";
+import bkTree from "./bkTree/bkTree";
 
-const tree =  new bkTree(wordList);
+const tree = new bkTree(wordList, { details: true });
+
+const selected = selected => {
+  console.log(`selected: ${selected}!`);
+};
+
+// OK, now I am just getting silly.
+const range = function*(start, end, step = 1) {
+  while (start <= end) {
+    yield start;
+    start += step;
+  }
+};
+
+const distanceRange = [...range(0, 10)];
+const resultLimit = [...range(5, 100, 5)];
 
 class App extends Component {
-  
   state = {
     matches: [],
-    distance: 0,
-    word: "tst"
-  }
+    distance: 2,
+    resultLimit: 20
+  };
 
   // componentDidMount() {
   //   this.tree = new bkTree(wordList);
   // }
 
-
   // componentDidUpdate() {
 
   // }
 
-  setDistance = (event) => {
-    event.preventDefault();
-      this.setState({
-        distance: event.target.value
-      })
-  }
-
-  setWord = (event) => {
+  setDistance = event => {
     event.preventDefault();
     this.setState({
-      word: event.target.value
-    })
-  }
+      distance: Number(event.target.value)
+    });
+  };
+
+  setLimit = event => {
+    event.preventDefault();
+    this.setState({
+      resultLimit: Number(event.target.value)
+    });
+  };
 
   // findMatches = (event) => {
   //   //console.log(event.target.value);
@@ -44,29 +58,37 @@ class App extends Component {
   //     matches: this.tree.query(event.target.value,1)
   //   });
   // }
-  
+
   render() {
-
-    const matches = tree.query(this.state.word, this.state.distance);
-
-    console.log(matches, this.state.word);
-
+    console.log(this.state.distance);
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <label>Distance</label><input value={this.state.distance} onChange={this.setDistance}/>
-        <label>Word</label><input value={this.state.word} onChange={this.setWord}/>
-        {
-          matches.map( (match,index) => {
-            return <div>{match}</div>
-          })
-        }
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <label>Distance </label>
+        <select value={this.state.distance} onChange={this.setDistance}>
+          {distanceRange.map(num => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+        <label>Result Limit </label>
+        <select value={this.state.resultLimit} onChange={this.setLimit}>
+          {resultLimit.map(num => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+        <BKDownshift
+          bkTree={tree}
+          selectCallBack={selected}
+          distance={this.state.distance}
+          resultLimit={this.state.resultLimit}
+        />
       </div>
     );
   }
