@@ -31,7 +31,7 @@ class bkTree {
     this.children = {};
   }
   /**
- * 
+ * Add an array of terms to the tree.
  * 
  * @param {string[]} newTerms 
  * @memberof bkTree
@@ -40,7 +40,7 @@ class bkTree {
     newTerms.forEach(term => this._addTerm(term));
   }
   /**
- * 
+ * Recurse through and add children
  * 
  * @param {string} newTerm 
  * @memberof bkTree
@@ -57,6 +57,8 @@ class bkTree {
   }
   /**
  * 
+ * Returns an array of matching results given a
+ * string, distance and max number of results.
  * 
  * @param {string} queryTerm 
  * @param {number} maxDist 
@@ -65,6 +67,8 @@ class bkTree {
  * @memberof bkTree
  */
   query(queryTerm, maxDist, max = null) {
+
+    // this is mutated by this.query, which is kind of ugly.
     let tempResults = [];
 
     this._query(queryTerm, maxDist, null, tempResults);
@@ -82,7 +86,8 @@ class bkTree {
     return results;
   }
   /**
- * 
+ * Recurses throught the bk tree finding matches 
+ * within the max distance. 
  * 
  * @param {string} queryTerm 
  * @param {number} maxDist 

@@ -1,6 +1,9 @@
 import Downshift from "downshift";
 import React from "react";
 
+/* This is just a basic Downshift select component that I replaced
+* the normal matching algo with the bk tree one.
+*/
 const BKDownshift = ({
   bkTree,
   distance = 2,

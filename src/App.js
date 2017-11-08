@@ -13,7 +13,9 @@ const selected = selected => {
 };
 
 /**
- * 
+ * Generator function that creates ranges of numbers
+ * given a start end and step.
+ * This is just for fun.
  * 
  * @param {number} start 
  * @param {number} end 
@@ -54,7 +56,7 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">BK Tree Demo</h1>
         </header>
         <label>Distance </label>
         <select value={this.state.distance} onChange={this.setDistance}>
