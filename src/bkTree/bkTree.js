@@ -100,7 +100,6 @@ class bkTree {
 
     if (dist <= maxDist) {
       results.push({ term: this.term, dist });
-      console.log(this.term, dist);
     }
 
     if (null === d) {
