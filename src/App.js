@@ -5,8 +5,11 @@ import BKDownshift from "./downshift/bkDownshift";
 
 import wordList from "./bkTree/names";
 import bkTree from "./bkTree/bkTree";
+import Tree from './tree/Tree';
 
 const tree = new bkTree(wordList, { details: true });
+
+console.log(tree);
 
 const selected = selected => {
   console.log(`selected: ${selected}!`);
@@ -80,6 +83,7 @@ class App extends Component {
           distance={this.state.distance}
           resultLimit={this.state.resultLimit}
         />
+        <Tree treeData={tree}/>
       </div>
     );
   }
