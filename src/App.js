@@ -57,7 +57,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
+        {/* <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">BK Tree Demo</h1>
         </header>
@@ -82,7 +82,7 @@ class App extends Component {
           selectCallBack={selected}
           distance={this.state.distance}
           resultLimit={this.state.resultLimit}
-        />
+        /> */}
         <Tree treeData={tree}/>
       </div>
     );
