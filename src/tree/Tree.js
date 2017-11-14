@@ -76,13 +76,13 @@ export default class Tree extends React.Component {
     update(root);
 
     // Collapse the node and all it's children
-    function collapse(d) {
-      if (d.children) {
-        d._children = d.children;
-        d._children.forEach(collapse);
-        d.children = null;
-      }
-    }
+    // function collapse(d) {
+    //   if (d.children) {
+    //     d._children = d.children;
+    //     d._children.forEach(collapse);
+    //     d.children = null;
+    //   }
+    // }
 
     function update(source) {
       // Assigns the x and y position for the nodes

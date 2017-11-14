@@ -1,5 +1,3 @@
-import {delay} from 'lodash';
-
 // Addapted from https://github.com/tjbaron/node-bktree/blob/master/lib/bktree.js
 // @ts-check
 import damlev from "damlev";
