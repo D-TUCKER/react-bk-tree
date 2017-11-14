@@ -1,6 +1,10 @@
+import {delay} from 'lodash';
+
 // Addapted from https://github.com/tjbaron/node-bktree/blob/master/lib/bktree.js
 // @ts-check
 import damlev from "damlev";
+
+const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 class bkTree {
   /**
@@ -14,6 +18,8 @@ class bkTree {
     this._addTerm = this._addTerm.bind(this);
     this.query = this.query.bind(this);
     this._query = this._query.bind(this);
+    this.slowQuery = this.slowQuery.bind(this);
+    this._slowQuery = this._slowQuery.bind(this);
 
     options = options || {};
     this.stringCompare = damlev;
@@ -55,6 +61,76 @@ class bkTree {
       this.children[dist] = new bkTree(newTerm, this.options);
     }
   }
+
+    /**
+ * 
+ * Returns an array of matching results given a
+ * string, distance and max number of results.
+ * 
+ * @param {string} queryTerm 
+ * @param {number} maxDist 
+ * @param {number} [max=null] 
+ * @returns {object[]|string[]}
+ * @memberof bkTree
+ */
+slowQuery(queryTerm, maxDist, max = null) {
+  // this is mutated by this.query, which is kind of ugly.
+  let tempResults = [];
+  console.log(queryTerm);
+  this._slowQuery(queryTerm, maxDist, null, tempResults);
+
+  tempResults.sort((a, b) => a.dist - b.dist);
+
+  let results = [];
+  let len = tempResults.length;
+  if (null !== max) {
+    len = Math.min(max, tempResults.length);
+  }
+  for (let i = 0; i < len; ++i) {
+    results.push(this.options.details ? tempResults[i] : tempResults[i].t);
+  }
+  return results;
+}
+
+  /**
+ * Recurses throught the bk tree finding matches 
+ * within the max distance. 
+ * 
+ * @param {string} queryTerm 
+ * @param {number} maxDist 
+ * @param {number} d 
+ * @param {object[]} results 
+ * @memberof bkTree
+ */
+async _slowQuery(queryTerm, maxDist, d, results) {
+  await timeout(1000);
+  
+  console.log(queryTerm,this.term);
+  const dist = this.stringCompare(this.term, queryTerm);
+  const ele = document.getElementById(this.term);
+  
+  if (dist <= maxDist) {
+    ele.style.fill = "green";
+    results.push({ term: this.term, dist });
+  } else {
+    ele.style.fill = "red";
+  }
+
+  if (null === d) {
+    d = dist;
+  }
+
+  const min = dist - maxDist;
+  const max = dist + maxDist;
+
+  for (let i = min; i <= max; ++i) {
+    if (this.children[i]) {
+      //await timeout(500);
+      this.children[i]._slowQuery(queryTerm, maxDist, d, results);
+    }
+  }
+}
+
   /**
  * 
  * Returns an array of matching results given a
@@ -67,7 +143,6 @@ class bkTree {
  * @memberof bkTree
  */
   query(queryTerm, maxDist, max = null) {
-
     // this is mutated by this.query, which is kind of ugly.
     let tempResults = [];
 
@@ -85,6 +160,7 @@ class bkTree {
     }
     return results;
   }
+
   /**
  * Recurses throught the bk tree finding matches 
  * within the max distance. 

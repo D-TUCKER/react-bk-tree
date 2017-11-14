@@ -1,33 +1,38 @@
 import React from "react";
 import * as d3 from "d3";
-//const treeData = require("./flare.json");
-
-// function forEachObj(obj,cb) {
-//   Object.keys(obj).forEach(cb);
-// }
+import {debounce} from 'lodash'
 
 export default class Tree extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.renderChart = this.renderChart.bind(this);
+    this.unMountAndRender = debounce(this.unMountAndRender.bind(this),500);
+  }
+  
+
   componentDidMount() {
-    //     var svg = d3.select("body").append("svg")
-    // 		.attr("width", 400)
-    // 		.attr("height", 120);
+    this.renderChart();
+    this.props.tree.slowQuery(this.props.word,2,20);
+  }
 
-    // //Create an SVG path
-    // svg.append("path")
-    // 	.attr("id", "wavy") //very important to give the path element a unique ID to reference later
-    // 	.attr("d", "M 10,90 Q 100,15 200,70 Q 340,140 400,30") //Notation for an SVG path, from bl.ocks.org/mbostock/2565344
-    // 	.style("fill", "none")
-    // 	.style("stroke", "#AAAAAA");
+  componentDidUpdate() {
+    this.unMountAndRender();
+  }
 
-    // //Create an SVG text element and append a textPath element
-    // svg.append("text")
-    //    .append("textPath") //append a textPath to the text element
-    // 	.attr("xlink:href", "#wavy") //place the ID of the path here
-    // 	// .style("text-anchor","middle") //place the text halfway on the arc
-    // 	// .attr("startOffset", "50%")
-    // 	.text("Yay, my text is on a wavy path");
+  unMountAndRender() {
+    d3
+    .select("body")
+    .select("svg")
+    .remove();
 
-    //console.log(this.props.treeData);
+    this.renderChart();
+    this.props.tree.slowQuery(this.props.word,2,20);
+  }
+
+  renderChart() {
+ 
     // Set the dimensions and margins of the diagram
     var margin = { top: 20, right: 90, bottom: 30, left: 90 },
       width = 1200 - margin.left - margin.right,
@@ -52,7 +57,7 @@ export default class Tree extends React.Component {
     var treemap = d3.tree().size([height, width]);
 
     // Assigns parent, children, height, depth
-    root = d3.hierarchy(this.props.treeData, function(d) {
+    root = d3.hierarchy(this.props.tree, function(d) {
       //console.log(d);
       if (d) {
         return Object.keys(d.children).map(key => {
@@ -66,7 +71,7 @@ export default class Tree extends React.Component {
     root.y0 = 0;
 
     // Collapse after the second level
-    root.children.forEach(collapse);
+    //root.children.forEach(collapse);
 
     update(root);
 
@@ -113,6 +118,11 @@ export default class Tree extends React.Component {
       nodeEnter
         .append("circle")
         .attr("class", "node")
+        .attr("id",function(d) {
+          //console.log(d);
+          if (d.data) {
+            return d.data.term;
+          }})
         .attr("r", 1e-6)
         .style("fill", function(d) {
           return d._children ? "lightsteelblue" : "#fff";
@@ -228,21 +238,17 @@ export default class Tree extends React.Component {
         .attr("fill", "Black")
         .style("font", "normal 12px Arial")
         .attr("text-anchor", "middle")
-        .attr("x",function(d) {
-          return (d.parent.y + d.y) / 2
+        .transition()
+        .duration(duration)
+        .attr("transform", function(d) {
+          return (
+            "translate(" +
+            (d.parent.y + d.y) / 2 +
+            "," +
+            (d.parent.x + d.x) / 2 +
+            ")"
+          );
         })
-        .attr("y",function(d) {
-          return (d.parent.x + d.x) / 2
-        })
-        // .attr("transform", function(d) {
-        //   return (
-        //     "translate(" +
-        //     (d.parent.y + d.y) / 2 +
-        //     "," +
-        //     (d.parent.x + d.x) / 2 +
-        //     ")"
-        //   );
-        // })
         .attr("dy", ".35em")
         .text(function(d) {
           return d.data.distance;
@@ -257,21 +263,19 @@ export default class Tree extends React.Component {
       .transition()
       .duration(duration)
       .select('.text')
-        .attr("x",function(d) {
-          return (d.parent.y + d.y) / 2
-        })
-        .attr("y",function(d) {
-          return (d.parent.x + d.x) / 2
-        })
+      .attr("transform", function(d) {
+        return (
+          "translate(" +
+          (d.parent.y + d.y) / 2 +
+          "," +
+          (d.parent.x + d.x) / 2 +
+          ")"
+        );
+      })
 
       text
         .exit()
         .transition()
-        // .duration(duration)
-        // // .attr("d", function(d) {
-        // //   var o = { x: source.x, y: source.y };
-        // //   return diagonal(o, o);
-        // // })
         .remove();
 
       // Store the old positions for transition.
@@ -305,6 +309,6 @@ export default class Tree extends React.Component {
   }
 
   render() {
-    return <div id="tree-container" />;
+    return <div id="tree-container" ref={ref => this.ref = ref}/>;
   }
 }

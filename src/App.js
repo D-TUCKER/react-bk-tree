@@ -7,9 +7,13 @@ import wordList from "./bkTree/names";
 import bkTree from "./bkTree/bkTree";
 import Tree from './tree/Tree';
 
-const tree = new bkTree(wordList, { details: true });
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
 
-console.log(tree);
+const tree = new bkTree(wordList.slice(0,20), { details: true });
 
 const selected = selected => {
   console.log(`selected: ${selected}!`);
@@ -35,9 +39,11 @@ const distanceRange = [...range(0, 10)];
 const resultLimit = [...range(5, 100, 5)];
 
 class App extends Component {
+
   state = {
     distance: 2,
-    resultLimit: 20
+    resultLimit: 20,
+    name: "abba"
   };
 
   setDistance = event => {
@@ -54,10 +60,22 @@ class App extends Component {
     });
   };
 
+  setName = event => {
+    event.preventDefault();
+    this.setState({
+      name: event.target.value
+    })
+  }
+
+  // componentDidMount() {
+  //   console.log("mounted");
+  //   tree.slowQuery(this.state.name,2,20);
+  // }
+
   render() {
     return (
       <div className="App">
-        {/* <header className="App-header">
+        <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">BK Tree Demo</h1>
         </header>
@@ -82,8 +100,9 @@ class App extends Component {
           selectCallBack={selected}
           distance={this.state.distance}
           resultLimit={this.state.resultLimit}
-        /> */}
-        <Tree treeData={tree}/>
+        />
+        <input value={this.state.name} onChange={this.setName}/>
+        <Tree tree={tree} word={this.state.name}/>
       </div>
     );
   }
