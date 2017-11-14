@@ -8,31 +8,29 @@ import * as d3 from "d3";
 
 export default class Tree extends React.Component {
   componentDidMount() {
+    //     var svg = d3.select("body").append("svg")
+    // 		.attr("width", 400)
+    // 		.attr("height", 120);
 
-//     var svg = d3.select("body").append("svg")
-// 		.attr("width", 400)
-// 		.attr("height", 120);
-			
-// //Create an SVG path			
-// svg.append("path")
-// 	.attr("id", "wavy") //very important to give the path element a unique ID to reference later
-// 	.attr("d", "M 10,90 Q 100,15 200,70 Q 340,140 400,30") //Notation for an SVG path, from bl.ocks.org/mbostock/2565344
-// 	.style("fill", "none")
-// 	.style("stroke", "#AAAAAA");
+    // //Create an SVG path
+    // svg.append("path")
+    // 	.attr("id", "wavy") //very important to give the path element a unique ID to reference later
+    // 	.attr("d", "M 10,90 Q 100,15 200,70 Q 340,140 400,30") //Notation for an SVG path, from bl.ocks.org/mbostock/2565344
+    // 	.style("fill", "none")
+    // 	.style("stroke", "#AAAAAA");
 
-// //Create an SVG text element and append a textPath element
-// svg.append("text")
-//    .append("textPath") //append a textPath to the text element
-// 	.attr("xlink:href", "#wavy") //place the ID of the path here
-// 	// .style("text-anchor","middle") //place the text halfway on the arc
-// 	// .attr("startOffset", "50%")		
-// 	.text("Yay, my text is on a wavy path");
-
+    // //Create an SVG text element and append a textPath element
+    // svg.append("text")
+    //    .append("textPath") //append a textPath to the text element
+    // 	.attr("xlink:href", "#wavy") //place the ID of the path here
+    // 	// .style("text-anchor","middle") //place the text halfway on the arc
+    // 	// .attr("startOffset", "50%")
+    // 	.text("Yay, my text is on a wavy path");
 
     //console.log(this.props.treeData);
     // Set the dimensions and margins of the diagram
     var margin = { top: 20, right: 90, bottom: 30, left: 90 },
-      width = 960 - margin.left - margin.right,
+      width = 1200 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
@@ -133,7 +131,7 @@ export default class Tree extends React.Component {
         .text(function(d) {
           //console.log(d);
           if (d.data) {
-            return `${d.data.term}: ${d.data.distance || "root"}`;
+            return d.data.term;
           }
         });
 
@@ -176,8 +174,7 @@ export default class Tree extends React.Component {
       // ****************** links section ***************************
 
       // Update the links...
-      var link = svg.selectAll("path.link")
-        .data(links, function(d) {
+      var link = svg.selectAll("path.link").data(links, function(d) {
         return d.id;
       });
 
@@ -206,85 +203,76 @@ export default class Tree extends React.Component {
 
       //      Remove any exiting links
       link
-      .exit()
+        .exit()
+        .transition()
+        .duration(duration)
+        .attr("d", function(d) {
+          var o = { x: source.x, y: source.y };
+          return diagonal(o, o);
+        })
+        .remove();
+
+      var text = svg.selectAll(".text-container").data(links, function(d) {
+        //console.log(d);
+        return d.id;
+      });
+
+      // Text Enter
+      text
+        .enter()
+        .insert("g")
+        .attr("class", "text-container")
+        .append("text")
+        .attr("class", "text")
+        .attr("font-family", "Arial, Helvetica, sans-serif")
+        .attr("fill", "Black")
+        .style("font", "normal 12px Arial")
+        .attr("text-anchor", "middle")
+        .attr("x",function(d) {
+          return (d.parent.y + d.y) / 2
+        })
+        .attr("y",function(d) {
+          return (d.parent.x + d.x) / 2
+        })
+        // .attr("transform", function(d) {
+        //   return (
+        //     "translate(" +
+        //     (d.parent.y + d.y) / 2 +
+        //     "," +
+        //     (d.parent.x + d.x) / 2 +
+        //     ")"
+        //   );
+        // })
+        .attr("dy", ".35em")
+        .text(function(d) {
+          return d.data.distance;
+        })
+
+        //text.transition().duration(duration)
+      // UPDATE
+      
+
+      // Update Text position for depth.
+      text
       .transition()
       .duration(duration)
-      .attr("d", function(d) {
-        var o = { x: source.x, y: source.y };
-        return diagonal(o, o);
-      })
-      .remove();
+      .select('.text')
+        .attr("x",function(d) {
+          return (d.parent.y + d.y) / 2
+        })
+        .attr("y",function(d) {
+          return (d.parent.x + d.x) / 2
+        })
 
-      var text = svg.selectAll(".text")
-      .data(links, function(d) {
-        //console.log(d);
-      return d.id;
-    });
-
-      var textEnter = text
-      .enter()
-      .insert("g")
-      .attr("class", "text")
-      //.attr("id",source.)
-      .append("text")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-      .attr("fill", "Black")
-      .style("font", "normal 12px Arial")
-      .attr("text-anchor", "middle")
-      .attr("transform", function(d) {
-          return "translate(" +
-              (d.parent.y + d.y)/2 + "," + 
-              (d.parent.x + d.x)/2 + ")";
-      })   
-      // .attr("dy", ".35em")
-      // .attr("text-anchor", "middle")
-      // .text(function(d) {
-      //     //console.log(d);
-      //      return d.data.distance;
-      // });
-
-      //   text.append("text")
-      //   .attr("font-family", "Arial, Helvetica, sans-serif")
-      //   .attr("fill", "Black")
-      //   .style("font", "normal 12px Arial")
-      //   .attr("transform", function(d) {
-      //     console.log(d);
-      //       return "translate(" +
-      //           (100) + "," + 
-      //           (100) + ")";
-      //   })   
-         .attr("dy", ".35em")
-        // .attr("text-anchor", "middle")
-        .text(function(d) {
-            //console.log(d);
-             return d.data.distance;
-        });
-
-
-              // UPDATE
-      var textUpdate = textEnter.merge(text);
-      
-            // Transition back to the parent element position
-            textUpdate
-              .transition()
-              .duration(duration)
-              .attr("transform", function(d) {
-                console.log((d.parent.y + d.y)/2,(d.parent.x + d.x)/2);
-                return "translate(" +
-                    (d.parent.y + d.y)/2 + "," + 
-                    (d.parent.x + d.x)/2 + ")";
-            })   
-
-
-            text
-            .exit()
-            .transition()
-            // .duration(duration)
-            // // .attr("d", function(d) {
-            // //   var o = { x: source.x, y: source.y };
-            // //   return diagonal(o, o);
-            // // })
-            .remove();
+      text
+        .exit()
+        .transition()
+        // .duration(duration)
+        // // .attr("d", function(d) {
+        // //   var o = { x: source.x, y: source.y };
+        // //   return diagonal(o, o);
+        // // })
+        .remove();
 
       // Store the old positions for transition.
       nodes.forEach(function(d) {
